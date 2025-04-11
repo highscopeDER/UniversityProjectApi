@@ -1,4 +1,4 @@
-package com.example.plugins
+package com.example.plugins.v1
 
 import kotlinx.coroutines.Dispatchers
 import org.jetbrains.exposed.sql.SortOrder

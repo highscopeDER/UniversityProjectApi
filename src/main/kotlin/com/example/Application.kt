@@ -6,7 +6,11 @@ import io.ktor.server.cio.*
 import io.ktor.server.engine.*
 
 fun main() {
-    embeddedServer(CIO, port = 8080, host = "localhost", module = Application::module)
+
+    val networkHost = "192.168.43.231"
+    val localHost = "localhost"
+
+    embeddedServer(CIO, port = 8080, host = localHost, module = Application::module)
         .start(wait = true)
 }
 
