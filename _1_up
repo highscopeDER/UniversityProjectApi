@@ -1,0 +1,7 @@
+#!/bin/bash
+
+cat ./.env > ./app/.env
+cat ./_start.sh > ./app/_start.sh
+chmod a+x ./app/_start.sh
+
+sudo docker-compose -f ./compose.yaml up -d
