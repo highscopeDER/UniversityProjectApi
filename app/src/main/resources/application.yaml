@@ -7,6 +7,6 @@ ktor:
 
 storage:
   driverClassName: "org.postgresql.Driver"
-  jdbcURL: "jdbc:postgresql://db:5433/tcp/miitnav"
+  jdbcURL: "jdbc:postgresql://db:5433/miitnav"
   user: "postgres"
   password: "admin"
