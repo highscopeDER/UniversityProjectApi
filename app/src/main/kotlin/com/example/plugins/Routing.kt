@@ -8,49 +8,31 @@ import io.ktor.server.routing.*
 
 fun Application.configureRouting() {
 
-    val daoOld = DAOImpl()
-
-    routing {
-
-        get("/allClassRooms") {
-            call.respond(daoOld.getClassRoomsList())
-        }
-
-        get("/data") {
-            call.respond(daoOld.getDataForAlgorithm())
-        }
-
-        get("/coordinates") {
-            call.respond(daoOld.getCoordinatesOfPoints())
-        }
-
-    }
-
     val newDao = NewDaoImpl()
 
     routing {
 
-        get("/v2/check") {
+        get("/check") {
             call.respondText("")
         }
 
-        get("/v2/allClassRooms") {
+        get("/allClassRooms") {
             call.respond(newDao.classRoomsList())
         }
 
-        get("/v2/data") {
+        get("/data") {
             call.respond(newDao.dataForAlgorithm())
         }
 
-        get("/v2/coordinates") {
+        get("/coordinates") {
             call.respond(newDao.coordinatesOfPoints())
         }
 
-        get("/v2/rooms") {
+        get("/rooms") {
             call.respond(newDao.rooms())
         }
 
-        get("/v2/roomsCoordinates") {
+        get("/roomsCoordinates") {
 
         }
 

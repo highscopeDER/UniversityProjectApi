@@ -7,29 +7,18 @@ import org.jetbrains.exposed.sql.Database
 fun Application.connection(config: ApplicationConfig) {
 
     val url = config.property("storage.jdbcURL").getString()
+    val database = config.property("storage.database").getString()
     val user = config.property("storage.user").getString()
     val password = config.property("storage.password").getString()
 
     Database.connect(
-        url = url,
+        url = url + database,
         user = user,
         password = password
     )
 
 }
 
-object Connection {
-
-    private const val BASE_URL: String = "jdbc:postgresql://localhost:5432/"
-
-    const val USER: String = "postgres"
-    const val DRIVER: String = "org.postgresql.Driver"
-    const val PASSWORD: String = "admin"
-
-    const val URL_V1: String = BASE_URL + "MIITNAV"
-    const val URL_V2: String = BASE_URL + "MIITNAV_V2"
-
-}
 
 
 

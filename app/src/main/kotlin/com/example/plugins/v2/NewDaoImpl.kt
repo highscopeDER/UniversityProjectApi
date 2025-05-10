@@ -85,9 +85,7 @@ class NewDaoImpl : NewDao {
     }
 
     override suspend fun rooms(): List<Floor> = dbQuery {
-
-        //val result = mutableMapOf<String, List<Pair<Float, Float>>>()
-
+    
         val floors: MutableList<Floor> = mutableListOf()
         val rooms: MutableList<Room> = mutableListOf()
 
@@ -126,9 +124,8 @@ class NewDaoImpl : NewDao {
 
         rooms.add(Room(roomName, roomLabel, points.toList()))
         floors.add(Floor(floor, rooms.toList()))
-        //result[room] = points.toList()
-
-        floors
+   
+        floors.toList()
     }
 
 
