@@ -34,3 +34,6 @@ out/
 
 ### VS Code ###
 .vscode/
+
+.env
+/miitnav_db/miitnav_db.sql
