@@ -1,21 +1,50 @@
 services:
   app:
     build: .
+    container_name: ktor-app
+    command: bash -c "/app/_start.sh"
     ports:
       - "8080:8080"
+    networks:
+      - ktor_network
+    env_file:
+      - ./.env
+    volumes:
+      - ./app:/app
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://127.0.0.1:8080/check"]
+      interval: 30s
+      timeout: 10s
+      retries: 6
     depends_on:
       db:
         condition: service_healthy
 
   db:
-    image: postgres
+    image: postgres:17.2
+    command: -c 'max_connections=500'
+    stdin_open: true
+    tty: true
+    container_name: ktor-db
     volumes:
-      - ./tmp/db:/var/lib/postgresql/data
-    environment:
-      POSTGRES_DB: MIITNAV
-      POSTGRES_HOST_AUTH_METHOD: trust
-    ports:
-      - "5432:5432"
+      - ./postgres-data:/var/lib/postgresql/data
+      - ./miitnav_db/:/docker-entrypoint-initdb.d
+      
     healthcheck:
       test: [ "CMD-SHELL", "pg_isready -U postgres" ]
-      interval: 1s
+      interval: 3s
+      timeout: 3s
+      retries: 50
+      
+    environment:
+      - POSTGRES_USER=${DB_USER}
+      - POSTGRES_PASSWORD=${DB_PASSWORD}
+      
+    env_file:
+      - ./.env
+    networks:
+      - ktor_network
+
+networks:
+  ktor_network:
+    name: ktor_network
