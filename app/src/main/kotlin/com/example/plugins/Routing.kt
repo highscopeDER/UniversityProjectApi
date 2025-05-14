@@ -1,6 +1,5 @@
 package com.example.plugins
 
-import com.example.plugins.v1.DAOImpl
 import com.example.plugins.v2.NewDaoImpl
 import io.ktor.server.application.*
 import io.ktor.server.response.*
