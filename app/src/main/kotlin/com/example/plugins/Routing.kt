@@ -15,6 +15,11 @@ fun Application.configureRouting() {
             call.respondText("")
         }
 
+	get("/verify") {
+	    call.respond(newDao.verify())
+	}
+	
+
         get("/allClassRooms") {
             call.respond(newDao.classRoomsList())
         }
