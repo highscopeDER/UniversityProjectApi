@@ -9,6 +9,7 @@ fun main(args: Array<String>) = EngineMain.main(args)
 
 fun Application.module() {
     configureSerialization()
+    configureSwagger()
     connection(environment.config)
     configureRouting()
 }

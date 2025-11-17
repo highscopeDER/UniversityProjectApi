@@ -45,5 +45,10 @@ dependencies {
     implementation("io.ktor:ktor-server-config-yaml:$ktor_version")
     testImplementation("io.ktor:ktor-server-tests-jvm")
     testImplementation("org.jetbrains.kotlin:kotlin-test-junit:$kotlin_version")
+
+    implementation("io.ktor:ktor-server-swagger:$ktor_version")
+    implementation("io.ktor:ktor-server-cors:$ktor_version")
+    implementation("io.ktor:ktor-server-openapi:${ktor_version}")
+    implementation("io.swagger.codegen.v3:swagger-codegen-generators:1.0.36")
 }
 
