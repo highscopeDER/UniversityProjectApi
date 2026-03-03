@@ -1,14 +1,11 @@
 package com.example.plugins
 
-import com.example.plugins.v1.DAOImpl
-import com.example.plugins.v2.NewDaoImpl
+import com.example.plugins.v2.NewDao
 import io.ktor.server.application.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
 
-fun Application.configureRouting() {
-
-    val newDao = NewDaoImpl()
+fun Application.configureRouting(dao: NewDao) {
 
     routing {
 
@@ -17,19 +14,19 @@ fun Application.configureRouting() {
         }
 
         get("/allClassRooms") {
-            call.respond(newDao.classRoomsList())
+            call.respond(dao.classRoomsList())
         }
 
         get("/data") {
-            call.respond(newDao.dataForAlgorithm())
+            call.respond(dao.dataForAlgorithm())
         }
 
         get("/coordinates") {
-            call.respond(newDao.coordinatesOfPoints())
+            call.respond(dao.coordinatesOfPoints())
         }
 
         get("/rooms") {
-            call.respond(newDao.rooms())
+            call.respond(dao.rooms())
         }
 
         get("/roomsCoordinates") {
