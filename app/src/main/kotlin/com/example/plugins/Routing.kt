@@ -1,6 +1,6 @@
 package com.example.plugins
 
-import com.example.plugins.v2.NewDao
+import com.example.modules.dbModule.dao.NewDao
 import io.ktor.server.application.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
@@ -27,10 +27,6 @@ fun Application.configureRouting(dao: NewDao) {
 
         get("/rooms") {
             call.respond(dao.rooms())
-        }
-
-        get("/roomsCoordinates") {
-
         }
 
     }

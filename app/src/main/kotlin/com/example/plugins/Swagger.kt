@@ -9,15 +9,15 @@ import io.ktor.server.routing.routing
 
 fun Application.configureSwagger(){
 
-    install(CORS) {
-        anyHost()
-        allowHeader(HttpHeaders.ContentType)
-    }
-
-    routing {
-        swaggerUI(path = "swagger") {
-
-        }
-    }
+//    install(CORS) {
+//        anyHost()
+//        allowHeader(HttpHeaders.ContentType)
+//    }
+//
+//    routing {
+//        swaggerUI(path = "swagger") {
+//
+//        }
+//    }
 
 }
