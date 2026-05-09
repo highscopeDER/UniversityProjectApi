@@ -3,7 +3,8 @@ package com.example.modules.dbModule.models
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class Floor(
-    val num: FloorsEnum,
-    val rooms: List<Room>
-)
+enum class FloorsEnum {
+    A0, A1, A2, A3, A4, A5, A6,
+    H1, H2, H3, H4, H5,
+    J1, J2, J3, J4;
+}

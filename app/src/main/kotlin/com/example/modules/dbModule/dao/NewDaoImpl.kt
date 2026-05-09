@@ -1,6 +1,7 @@
 package com.example.modules.dbModule.dao
 
 import com.example.modules.dbModule.models.Floor
+import com.example.modules.dbModule.models.FloorsEnum
 import com.example.modules.dbModule.models.Room
 import com.example.modules.dbModule.tables.Coord
 import com.example.modules.dbModule.tables.Neighbour
@@ -44,6 +45,9 @@ class NewDaoImpl : NewDao {
             .map {
                 val pName = it[Neighbour.pointName]
                 val nName = it[Neighbour.neighbourName]
+                if(pName.last() == 'l' || nName.last() == 'l'){
+                    return@map
+                }
                 if (lastPoint == null) {
                     lastPoint = pName
 
@@ -91,7 +95,7 @@ class NewDaoImpl : NewDao {
         val floors: MutableList<Floor> = mutableListOf()
         val rooms: MutableList<Room> = mutableListOf()
 
-        var floor: Int = 1
+        var floor: FloorsEnum = FloorsEnum.A0
         var roomLabel: String = "0"
         var roomName = ""
         val points: MutableList<Pair<Float, Float>> = mutableListOf()
@@ -114,12 +118,12 @@ class NewDaoImpl : NewDao {
                 }
                 points.add(it[Rooms.x] to it[Rooms.y])
 
-                if (it[Rooms.pointName][1].digitToInt() != floor) {
+                if (it[Rooms.pointName].floor != floor) {
                     if (rooms.isNotEmpty()) {
                         floors.add(Floor(floor, rooms.toList()))
                     }
                     rooms.clear()
-                    floor = it[Rooms.pointName][1].digitToInt()
+                    floor = it[Rooms.pointName].floor
                 }
 
             }
@@ -130,5 +134,37 @@ class NewDaoImpl : NewDao {
         floors.toList()
     }
 
+    private val String.floor: FloorsEnum get() = when(this.first()) {
+        'a' -> when(this[1].digitToInt()) {
+            0 -> FloorsEnum.A0
+            1 -> FloorsEnum.A1
+            2 -> FloorsEnum.A2
+            3 -> FloorsEnum.A3
+            4 -> FloorsEnum.A4
+            5 -> FloorsEnum.A5
+            6 -> FloorsEnum.A6
+            else -> FloorsEnum.A0
+        }
+
+        'h' -> when(this[1].digitToInt()) {
+            1 -> FloorsEnum.H1
+            2 -> FloorsEnum.H2
+            3 -> FloorsEnum.H3
+            4 -> FloorsEnum.H4
+            5 -> FloorsEnum.H5
+            else -> FloorsEnum.H1
+        }
+
+        'j' -> when(this[1].digitToInt()) {
+            1 -> FloorsEnum.J1
+            2 -> FloorsEnum.J2
+            3 -> FloorsEnum.J3
+            4 -> FloorsEnum.J4
+            else -> FloorsEnum.J1
+        }
+
+        else -> FloorsEnum.A0
+    }
 
 }
+

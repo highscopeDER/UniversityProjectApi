@@ -7,8 +7,8 @@ val exposed_version: String by project
 plugins {
     application
 
-    kotlin("jvm") version "2.0.0"
-    id("io.ktor.plugin") version "2.3.11"
+    kotlin("jvm") version "2.3.0"
+    id("io.ktor.plugin") version "3.4.3"
     id("org.jetbrains.kotlin.plugin.serialization") version "2.0.0"
 }
 
@@ -27,6 +27,14 @@ repositories {
     //maven { url = uri("https://maven.pkg.jetbrains.space/public/p/ktor/eap") }
 }
 
+ktor {
+    openApi {
+        enabled = true
+        codeInferenceEnabled = true
+        onlyCommented = false
+    }
+}
+
 dependencies {
     implementation("io.ktor:ktor-server-core-jvm")
     implementation("io.ktor:ktor-serialization-kotlinx-json-jvm")
@@ -43,6 +51,9 @@ dependencies {
     implementation("io.ktor:ktor-server-cio-jvm")
     implementation("ch.qos.logback:logback-classic:$logback_version")
     implementation("io.ktor:ktor-server-config-yaml:$ktor_version")
+    implementation("io.ktor:ktor-server-routing-openapi:2.3.11")
+    implementation("io.insert-koin:koin-ktor:4.2.0")
+    implementation("io.insert-koin:koin-logger-slf4j:4.2.0")
     testImplementation("io.ktor:ktor-server-tests-jvm")
     testImplementation("org.jetbrains.kotlin:kotlin-test-junit:$kotlin_version")
 
@@ -51,6 +62,5 @@ dependencies {
     implementation("io.ktor:ktor-server-swagger:$ktor_version")
     implementation("io.ktor:ktor-server-cors:$ktor_version")
     implementation("io.ktor:ktor-server-openapi:${ktor_version}")
-    implementation("io.swagger.codegen.v3:swagger-codegen-generators:1.0.36")
 }
 

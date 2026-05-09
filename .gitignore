@@ -34,3 +34,6 @@ out/
 
 ### VS Code ###
 .vscode/
+
+ app/__stdout.log
+ app/ktor-sample.jar
