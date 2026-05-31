@@ -1,0 +1,17 @@
+package com.example.modules.dbModule.tables
+
+import org.jetbrains.exposed.sql.Table
+import org.jetbrains.exposed.sql.VarCharColumnType
+
+object Users : Table() {
+
+    val id = integer(name = "id")
+    val name = varchar("name", 255)
+    val email = varchar("email", 255)
+    val login = varchar("login", 255)
+    val password = varchar("password", 255)
+    val role = varchar("role", 255)
+    val active = bool("active")
+    val access = array<String>("access", VarCharColumnType(2))
+
+}
