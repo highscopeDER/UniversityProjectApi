@@ -1,5 +1,6 @@
 package com.example.modules.dbModule.tables
 
+import org.jetbrains.exposed.sql.CharColumnType
 import org.jetbrains.exposed.sql.Table
 import org.jetbrains.exposed.sql.VarCharColumnType
 
@@ -12,6 +13,6 @@ object Users : Table() {
     val password = varchar("password", 255)
     val role = varchar("role", 255)
     val active = bool("active")
-    val access = array<String>("access", VarCharColumnType(2))
+    val access = array<Char>("access")
 
 }

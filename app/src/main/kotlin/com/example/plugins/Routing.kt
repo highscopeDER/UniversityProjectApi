@@ -14,6 +14,8 @@ fun Application.configureRouting() {
 
         dbRouting()
         pathFindingRouting()
+        adminRouting()
         swagger()
+
     }
 }

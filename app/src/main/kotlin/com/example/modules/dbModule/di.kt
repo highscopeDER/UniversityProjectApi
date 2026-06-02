@@ -11,4 +11,6 @@ val dbModule = module {
     singleOf(::NewDaoImpl) bind NewDao::class
     singleOf(::DbRepositoryImpl)
 
+    singleOf(::AdminRepositoryImpl)
+
 }
