@@ -5,6 +5,7 @@ import com.example.modules.dbModule.models.User
 import com.example.modules.dbModule.models.dto.Point
 import com.example.modules.dbModule.models.requests.LinkRequest
 import com.example.modules.dbModule.models.requests.PointInsertRequest
+import com.example.modules.dbModule.models.requests.UserRequest
 import io.ktor.http.HttpStatusCode
 import io.ktor.server.request.receive
 import io.ktor.server.response.respond
@@ -42,7 +43,8 @@ fun Route.adminRouting() {
 
 
     post("$BASE_POST/{action}/user") {
-        val user = call.receive<User>()
+        val user = call.receive<UserRequest>()
+
         when(call.parameters["action"]) {
             "add" -> {repository.upsertUser(user)}
             "remove" -> {repository.deleteUser(user)}

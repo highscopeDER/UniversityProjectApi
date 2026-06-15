@@ -1,12 +1,11 @@
-package com.example.modules.dbModule.models
+package com.example.modules.dbModule.models.requests
 
 import com.example.modules.dbModule.letter
-import com.example.modules.dbModule.models.requests.UserRequest
-import com.example.modules.dbModule.num
+import com.example.modules.dbModule.models.User
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class User(
+data class UserRequest(
     val id: Int,
     val name: String,
     val mail: String,
@@ -14,10 +13,10 @@ data class User(
     val password: String,
     val role: String,
     val active: Boolean,
-    val access: List<Char>
+    val access: List<Int>
 ) {
-    fun toUserRequest(): UserRequest {
-        return UserRequest(
+    fun toUser(): User {
+        return User(
             id = id,
             name = name,
             mail = mail,
@@ -25,7 +24,7 @@ data class User(
             password = password,
             role = role,
             active = active,
-            access = access.map { it.num }
+            access = access.map { it.letter }
         )
     }
 }

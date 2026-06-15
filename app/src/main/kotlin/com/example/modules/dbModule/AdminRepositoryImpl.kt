@@ -7,6 +7,7 @@ import com.example.modules.dbModule.models.dto.Point
 import com.example.modules.dbModule.models.dto.PointLinks
 import com.example.modules.dbModule.models.requests.LinkRequest
 import com.example.modules.dbModule.models.requests.PointInsertRequest
+import com.example.modules.dbModule.models.requests.UserRequest
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.cancel
@@ -69,16 +70,16 @@ class AdminRepositoryImpl(val adminDao: AdminDaoImpl) {
         return adminDao.getUsers().find { it.login == login && it.password == password }
     }
 
-    suspend fun getUsers(): List<User> {
-        return adminDao.getUsers()
+    suspend fun getUsers(): List<UserRequest> {
+        return adminDao.getUsers().map { it.toUserRequest() }
     }
 
-    suspend fun upsertUser(newUser: User) {
-        if (newUser.id == -1) adminDao.insertUser(newUser)
-        else adminDao.updateUser(newUser)
+    suspend fun upsertUser(newUser: UserRequest) {
+        if (newUser.id == -1) adminDao.insertUser(newUser.toUser())
+        else adminDao.updateUser(newUser.toUser())
     }
 
-    suspend fun deleteUser(user: User) {
+    suspend fun deleteUser(user: UserRequest) {
         adminDao.deleteUser(user.id)
     }
 
