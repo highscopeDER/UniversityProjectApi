@@ -135,6 +135,7 @@ class AdminRepositoryImpl(val adminDao: AdminDaoImpl) {
         val point = Point(
             name = "${request.building.letter}${request.floor}$num${typeChar.orEmpty()}",
             label = request.label,
+            type = request.type,
             x = request.x,
             y = request.y,
         )

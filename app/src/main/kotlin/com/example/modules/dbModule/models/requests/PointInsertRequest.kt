@@ -8,6 +8,7 @@ data class PointInsertRequest(
     val building: Int,
     val floor: Int,
     val label: String?,
+    val type: Int,
     val x: Float,
     val y: Float,
 )

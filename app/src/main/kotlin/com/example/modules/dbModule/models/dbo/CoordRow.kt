@@ -16,6 +16,7 @@ data class CoordRow(
         return Point(
             this.pointName,
             this.typeDescription,
+            this.type,
             this.x,
             this.y
         )
