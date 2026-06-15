@@ -3,6 +3,7 @@ package com.example.modules.dbModule
 import com.example.modules.dbModule.dao.AdminDaoImpl
 import com.example.modules.dbModule.models.Room
 import com.example.modules.dbModule.models.User
+import com.example.modules.dbModule.models.dto.IPoint
 import com.example.modules.dbModule.models.dto.Point
 import com.example.modules.dbModule.models.dto.PointLinks
 import com.example.modules.dbModule.models.requests.LinkRequest
@@ -190,6 +191,10 @@ class AdminRepositoryImpl(val adminDao: AdminDaoImpl) {
                 adminDao.deleteNeighbourStatement(link.toNeighbourRow())
             )
         )
+    }
+
+    suspend fun getIPointList(): List<IPoint> {
+        return adminDao.getIPointsList().map { it.toIPoint() }
     }
 
     sealed interface Operation{

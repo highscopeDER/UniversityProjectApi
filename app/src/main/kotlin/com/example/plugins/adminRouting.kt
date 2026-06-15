@@ -118,4 +118,8 @@ fun Route.adminRouting() {
         }
     }
 
+    get("$BASE_GET/ipoints") {
+        call.respond(repository.getIPointList())
+    }
+
 }

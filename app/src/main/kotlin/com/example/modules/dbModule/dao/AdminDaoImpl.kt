@@ -2,9 +2,11 @@ package com.example.modules.dbModule.dao
 
 import com.example.modules.dbModule.models.User
 import com.example.modules.dbModule.models.dbo.CoordRow
+import com.example.modules.dbModule.models.dbo.IPointRow
 import com.example.modules.dbModule.models.dbo.NeighbourRow
 import com.example.modules.dbModule.models.dbo.RoomRow
 import com.example.modules.dbModule.tables.Coord
+import com.example.modules.dbModule.tables.Ipoints
 import com.example.modules.dbModule.tables.Neighbour
 import com.example.modules.dbModule.tables.Rooms
 import com.example.modules.dbModule.tables.Users
@@ -140,6 +142,10 @@ class AdminDaoImpl : AdminDao {
         Rooms.deleteWhere {
             (Rooms.pointName eq room.pointName) and (Rooms.pointPos eq room.position)
         }
+    }
+
+    suspend fun getIPointsList(): List<IPointRow> = dbQuery {
+         Ipoints.selectAll().map { IPointRow.fromResultRow(it) }
     }
 
 
