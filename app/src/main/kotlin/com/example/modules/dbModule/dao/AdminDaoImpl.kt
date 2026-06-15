@@ -52,30 +52,41 @@ class AdminDaoImpl : AdminDao {
         Users.selectAll().map { it.toUser() }
     }
 
-    suspend fun updateUser(newUser: User) = dbQuery {
-        Users.updateReturning(where = { Users.id eq newUser.id}) {
-            it[name] = newUser.name
-            it[email] = newUser.mail
-            it[role] = newUser.role
-            it[active] = newUser.active
-            it[access] = newUser.access
-        }.single().toUser()
+    suspend fun updateUser(newUser: User): String? = dbQuery {
+        try {
+            Users.update(where = { Users.id eq newUser.id}) {
+                it[name] = newUser.name
+                it[email] = newUser.mail
+                it[role] = newUser.role
+                it[active] = newUser.active
+                it[access] = newUser.access
+            }
+            null
+        } catch (e: Exception) {e.localizedMessage ?: "Unknown error occurred"}
+
     }
 
-    suspend fun insertUser(newUser: User): User = dbQuery {
-        Users.insertReturning {
-            it[name] = newUser.name
-            it[email] = newUser.mail
-            it[login] = newUser.login
-            it[password] = newUser.password
-            it[role] = newUser.role
-            it[active] = newUser.active
-            it[access] = newUser.access
-        }.single().toUser()
+    suspend fun insertUser(newUser: User): String? = dbQuery {
+        try {
+            Users.insert {
+                it[name] = newUser.name
+                it[email] = newUser.mail
+                it[login] = newUser.login
+                it[password] = newUser.password
+                it[role] = newUser.role
+                it[active] = newUser.active
+                it[access] = newUser.access
+            }
+            null
+        } catch (e: Exception) {e.localizedMessage ?: "Unknown database error occurred"}
     }
 
-    suspend fun deleteUser(id: Int) = dbQuery {
-        Users.deleteWhere { Users.id eq id }
+    suspend fun deleteUser(id: Int): String? = dbQuery {
+        try {
+            Users.deleteWhere { Users.id eq id }
+            null
+        } catch (e: Exception) {e.localizedMessage ?: "Unknown error occurred"}
+
     }
 
     suspend fun getCoordinates(): List<CoordRow> = dbQuery {

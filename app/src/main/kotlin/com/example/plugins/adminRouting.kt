@@ -45,11 +45,13 @@ fun Route.adminRouting() {
     post("$BASE_POST/{action}/user") {
         val user = call.receive<UserRequest>()
 
-        when(call.parameters["action"]) {
-            "add" -> {repository.upsertUser(user)}
-            "remove" -> {repository.deleteUser(user)}
-            else -> call.respond(HttpStatusCode.BadRequest)
-        }
+        call.respond(
+            when(call.parameters["action"]) {
+                "add" -> repository.upsertUser(user) ?: HttpStatusCode.OK
+                "remove" -> repository.deleteUser(user) ?: HttpStatusCode.OK
+                else -> HttpStatusCode.BadRequest
+            }
+        )
     }
 
     get("$BASE_GET/buildings") {

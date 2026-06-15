@@ -75,13 +75,13 @@ class AdminRepositoryImpl(val adminDao: AdminDaoImpl) {
         return adminDao.getUsers().map { it.toUserRequest() }
     }
 
-    suspend fun upsertUser(newUser: UserRequest) {
-        if (newUser.id == -1) adminDao.insertUser(newUser.toUser())
+    suspend fun upsertUser(newUser: UserRequest): String? {
+        return if (newUser.id == -1) adminDao.insertUser(newUser.toUser())
         else adminDao.updateUser(newUser.toUser())
     }
 
-    suspend fun deleteUser(user: UserRequest) {
-        adminDao.deleteUser(user.id)
+    suspend fun deleteUser(user: UserRequest): String? {
+        return adminDao.deleteUser(user.id)
     }
 
     fun getBuildingList(): List<Int> {
