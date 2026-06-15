@@ -45,7 +45,6 @@ dependencies {
     implementation("org.jetbrains.exposed:exposed-dao:$exposed_version")
     implementation("org.jetbrains.exposed:exposed-jdbc:$exposed_version")
 
-    implementation("com.h2database:h2:2.2.220")
     implementation("org.postgresql:postgresql:42.7.2")
     implementation("com.h2database:h2:2.2.220")
     implementation("io.ktor:ktor-server-cio-jvm")
@@ -54,10 +53,9 @@ dependencies {
     implementation("io.ktor:ktor-server-routing-openapi:2.3.11")
     implementation("io.insert-koin:koin-ktor:4.2.0")
     implementation("io.insert-koin:koin-logger-slf4j:4.2.0")
-    testImplementation("io.ktor:ktor-server-tests-jvm")
+    //testImplementation("io.ktor:ktor-server-tests-jvm")
     testImplementation("org.jetbrains.kotlin:kotlin-test-junit:$kotlin_version")
 
-    //implementation("io.ktor:ktor-server-di:${ktor_version}")
 
     implementation("io.ktor:ktor-server-swagger:$ktor_version")
     implementation("io.ktor:ktor-server-cors:$ktor_version")

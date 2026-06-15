@@ -1,5 +1,6 @@
 package com.example.modules.dbModule
 
+import com.example.modules.dbModule.dao.AdminDaoImpl
 import com.example.modules.dbModule.dao.NewDao
 import com.example.modules.dbModule.dao.NewDaoImpl
 import org.koin.core.module.dsl.singleOf
@@ -10,6 +11,8 @@ val dbModule = module {
 
     singleOf(::NewDaoImpl) bind NewDao::class
     singleOf(::DbRepositoryImpl)
+
+    singleOf(::AdminDaoImpl)
 
     singleOf(::AdminRepositoryImpl)
 

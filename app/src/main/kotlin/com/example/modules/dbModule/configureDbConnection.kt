@@ -2,7 +2,7 @@ package com.example.modules.dbModule
 
 import io.ktor.server.application.*
 import io.ktor.server.config.*
-import org.jetbrains.exposed.sql.Database
+import org.jetbrains.exposed.v1.jdbc.Database
 
 fun Application.configureDBConnection(config: ApplicationConfig) {
 

@@ -1,174 +1,315 @@
 package com.example.modules.dbModule
 
-import com.example.modules.dbModule.dao.AdminDao
+import com.example.modules.dbModule.dao.AdminDaoImpl
 import com.example.modules.dbModule.models.Room
-import com.example.modules.pathFindingModule.Node
-import kotlinx.serialization.Serializable
+import com.example.modules.dbModule.models.User
+import com.example.modules.dbModule.models.dto.Point
+import com.example.modules.dbModule.models.dto.PointLinks
+import com.example.modules.dbModule.models.requests.LinkRequest
+import com.example.modules.dbModule.models.requests.PointInsertRequest
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.cancel
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharedFlow
+import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.emptyFlow
+import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.toList
+import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.launch
+import kotlinx.serialization.descriptors.buildSerialDescriptor
+import org.jetbrains.exposed.v1.core.statements.Statement
 
-class AdminRepositoryImpl {
+class AdminRepositoryImpl(val adminDao: AdminDaoImpl) {
 
-    fun auth(login: String, password: String): User? {
-        return db.users.find {
-            it.login == login && it.password == password
+    private val points: MutableStateFlow<List<Point>> = MutableStateFlow(emptyList())
+    private val links: MutableStateFlow<List<PointLinks>> = MutableStateFlow(emptyList())
+    private val rooms: MutableStateFlow<List<Room>> = MutableStateFlow(emptyList())
+
+    private val operationStore: MutableSharedFlow<Operation> = MutableSharedFlow()
+    private val operationStatements: MutableList<Statement<Any>> = mutableListOf()
+
+    init {
+        CoroutineScope(Dispatchers.IO).launch {
+
+            launch { reload() }
+
+            operationStore.collect { operation ->
+                operationStatements.add(operation.statement)
+                when(operation) {
+                    is Operation.Points.Cascade -> {
+                        points.update { operation.opPoint(it) }
+                        links.update { operation.opLink(it) }
+                        rooms.update { operation.opRoom(it) }
+                    }
+
+                    is Operation.Points -> {
+                        points.update { operation.opPoint(it) }
+                    }
+
+                    is Operation.PointsLinks -> {
+                        links.update { operation.opLink(it) }
+                    }
+
+                }
+            }
         }
     }
 
-    fun getBuildingList(): List<Char> {
-        return db.pois
-            .map { it.name.first() }
+    suspend fun reload() {
+        points.update { adminDao.getCoordinates().map { it.toPoint() }.toList() }
+        links.update { PointLinks.fromNeighbourRowList(adminDao.getNeighbours()) }
+        rooms.update { Room.fromRoomRowList(adminDao.getRooms()) }
+    }
+
+    suspend fun auth(login: String, password: String): User? {
+        return adminDao.getUsers().find { it.login == login && it.password == password }
+    }
+
+    suspend fun getUsers(): List<User> {
+        return adminDao.getUsers()
+    }
+
+    suspend fun upsertUser(newUser: User) {
+        if (newUser.id == -1) adminDao.insertUser(newUser)
+        else adminDao.updateUser(newUser)
+    }
+
+    suspend fun deleteUser(user: User) {
+        adminDao.deleteUser(user.id)
+    }
+
+    fun getBuildingList(): List<Int> {
+        return points.value
+            .map { it.name.first().num }
             .distinct()
-            .toList()
             .sorted()
     }
 
-
-    fun addNewBuilding() {
-
+    fun getFloorList(building: Int): List<Int> {
+        return points.value
+            .filter { it.name.first().num == building }
+            .map { it.name[1].digitToInt() }
+            .distinct()
+            .sorted()
     }
 
-    fun removeBuilding(num: Char) {
-
-    }
-
-    fun getRoomsList(building: Char, floor: Int? = null): List<Room> {
-        return db.rooms.filter {
-            if (floor != null) it.name[0] == building && it.name[1].digitToInt() == floor
-            else it.name[0] == building
+    suspend fun applyChanges(): String? {
+        val res = adminDao.runInTransaction(operationStatements.toList())
+        if (res == null) {
+            operationStatements.clear()
+            reload()
         }
+        return res
     }
 
-    fun addNewRoom(room: Room) {
+    fun getPointList(building: Int?, floor: Int?): List<Point> {
 
-    }
-
-    fun removeClassroom() {}
-
-    fun addNewFloor() {}
-
-    fun removeFloor() {}
-
-    fun addNewFloorMap() {}
-
-    fun removeFloorMap() {}
-
-    fun getPointList(building: Char? = null, floor: Int? = null): List<Poi> {
-
-        val predicates: MutableList<(Poi) -> Boolean> = mutableListOf()
-
+        val predicates: MutableList<(Point) -> Boolean> = mutableListOf()
         if (floor != null) predicates.add { it.name[1].digitToInt() == floor }
-        if (building != null) predicates.add { it.name[0] == building }
+        if (building != null) predicates.add { it.name.first() == building.letter }
 
-        return db.pois.filter {
+        return points.value.filter {
             predicates.all { predicate -> predicate(it) }
-        }.toList()
+        }
     }
 
-    fun getGraph(building: Char, floor: Int): Map<Node, List<Node>> {
+    suspend fun insertPoint(request: PointInsertRequest) {
 
-        return db.graph.filter {
-            it.key.name.first() == building && it.key.name[1].digitToInt() == floor
+        val num = points.value.count {
+            it.name.startsWith("${request.building.letter}${request.floor}")
+        }.inc().toString().padStart(3, '0')
+
+        val typeChar: String? = when(request.label) {
+            "Лестница" -> "s"
+            "Лифт" -> "l"
+            "Туалет" -> "wc"
+            else -> null
+        }
+
+        val point = Point(
+            name = "${request.building.letter}${request.floor}$num${typeChar.orEmpty()}",
+            label = request.label,
+            x = request.x,
+            y = request.y,
+        )
+
+        operationStore.emit(
+            Operation.Points.Upsert(
+                point,
+            adminDao.upsertCoordinateStatement(point.toCoordRow())
+            )
+        )
+    }
+
+    suspend fun updatePoint(point: Point) {
+        operationStore.emit(
+            Operation.Points.Upsert(
+                point,
+                adminDao.upsertCoordinateStatement(point.toCoordRow())
+            )
+        )
+    }
+
+    suspend fun deletePoint(point: Point) {
+        operationStore.emit(
+            Operation.Points.Cascade.Delete(
+                point,
+                adminDao.deleteCoordinateStatement(point.name)
+            )
+        )
+    }
+
+    fun getLinkList(building: Int?, floor: Int?): List<PointLinks> {
+        val predicates: MutableList<(String) -> Boolean> = mutableListOf()
+        if (floor != null) predicates.add { it[1].digitToInt() == floor }
+        if (building != null) predicates.add { it.first() == building.letter }
+
+        return links.value.filter {
+            predicates.all { predicate -> predicate(it.pointName) }
+        }
+    }
+
+    suspend fun insertLink(link: LinkRequest) {
+        operationStore.emit(
+            Operation.PointsLinks.Insert(
+                link,
+                adminDao.insertNeighbourStatement(link.toNeighbourRow())
+            )
+        )
+    }
+
+    suspend fun deleteLink(link: LinkRequest) {
+        operationStore.emit(
+            Operation.PointsLinks.Delete(
+                link,
+                adminDao.deleteNeighbourStatement(link.toNeighbourRow())
+            )
+        )
+    }
+
+    sealed interface Operation{
+        val statement: Statement<Any>
+
+        sealed interface Points : Operation {
+            val item: Point
+
+            fun opPoint(
+                list: List<Point>,
+            ): List<Point>
+
+            data class Upsert(
+                override val item: Point,
+                override val statement: Statement<Any>
+            ) : Operation.Points {
+                override fun opPoint(
+                    list: List<Point>,
+                ): List<Point> {
+                    return if(list.any { it.name == item.name })
+                        list.map { if(it.name == item.name) it else item }.toList()
+                    else list.plus(item)
+                }
+            }
+
+
+            sealed interface Cascade: Points {
+                fun opLink(list: List<PointLinks>): List<PointLinks>
+                fun opRoom(list: List<Room>): List<Room>
+
+                data class Delete(
+                    override val item: Point,
+                    override val statement: Statement<Any>
+                ): Cascade {
+                    override fun opLink(
+                        list: List<PointLinks>,
+                    ): List<PointLinks> {
+                        return list
+                            .filterNot { it.pointName == item.name }
+                            .map {
+                                it.copy(
+                                    links = it.links.filterNot { link -> link == item.name }
+                                )
+                            }
+                    }
+
+                    override fun opRoom(
+                        list: List<Room>,
+                    ): List<Room> {
+                        return list.filterNot { it.name == item.name }
+                    }
+
+                    override fun opPoint(
+                        list: List<Point>,
+                    ): List<Point> {
+                        return list.minus(item)
+                    }
+
+                }
+
+            }
+
+
+        }
+
+        sealed interface PointsLinks : Operation {
+
+            val link: LinkRequest
+            fun opLink(list: List<PointLinks>): List<PointLinks>
+
+            data class Insert(
+                override val link: LinkRequest,
+                override val statement: Statement<Any>
+            ) : PointsLinks {
+                override fun opLink(list: List<PointLinks>): List<PointLinks> {
+                    val c = list.find { it.pointName == link.from } == null
+                    return if (c) {
+                        list
+                            .plus(PointLinks(link.from, listOf(link.to)))
+                            .map {
+                                if(it.pointName == link.to) it.copy(links = it.links.plus(link.from))
+                                else it
+                            }
+                    } else list.map {
+                        when(it.pointName) {
+                            link.from -> it.copy(links = it.links.plus(link.to))
+                            link.to -> it.copy(links = it.links.plus(link.from))
+                            else -> it
+                        }
+                    }
+                }
+
+            }
+
+            data class Delete(
+                override val link: LinkRequest,
+                override val statement: Statement<Any>
+            ) : PointsLinks {
+                override fun opLink(list: List<PointLinks>): List<PointLinks> {
+                    val c = list.count { it.links.contains(link.from) }
+                    return if (c < 2) {
+                        list
+                            .filterNot { it.pointName == link.from  }
+                            .map {
+                                if(it.links.contains(link.from)) it.copy(links = it.links.minus(link.from))
+                                else it
+                            }
+                    } else list.map {
+                        when(it.pointName) {
+                            link.from -> it.copy(links = it.links.minus(link.to))
+                            link.to -> it.copy(links = it.links.minus(link.from))
+                            else -> it
+                        }
+                    }
+                }
+            }
+
+
         }
 
     }
-
-    fun getUsers(): List<User> {
-        return db.users
-    }
-
-    fun removeUser(userId: Int) {
-        db.users.removeIf { it.id == userId }
-    }
-
-    fun upsertUser(user: User) {
-        db.users.find { it.id == user.id }?.let {
-            db.users[db.users.indexOf(it)] = user
-        } ?: db.users.add(user)
-    }
-
-    private object db {
-
-        private val adminUser = User(
-            1,
-            "irina",
-            "ale@mail.ru",
-            "admin",
-            "password",
-            "admin",
-            true,
-            listOf('a', 'h')
-
-        )
-
-        val users = mutableListOf<User>(adminUser)
-
-        val pois = mutableListOf<Poi>(
-            Poi("h1001", null, 1f, 1f),
-            Poi("h1006s", null, 1f, 1f),
-            Poi("h2001s", null, 1f, 1f),
-            Poi("h4001s", null, 1f, 1f),
-            Poi("a1001", null, 1f, 1f),
-            Poi("a3001", null, 1f, 1f),
-            Poi("a3002", null, 1f, 1f),
-            Poi("j1001", null, 1f, 1f),
-            Poi("j1002", null, 1f, 1f),
-            Poi("j2001", null, 1f, 1f),
-        )
-
-        val graph = mutableMapOf<Node, List<Node>>(
-            Node("h1001", 1f,1f) to listOf(
-                Node("h1006s", 1f, 1f),
-            ),
-            Node("h1006s", 1f,1f) to listOf(
-                Node("h1001", 1f, 1f),
-                Node("h2001s", 1f, 1f),
-            ),
-            Node("h2001s", 1f,1f) to listOf(
-                Node("h1006s", 1f, 1f),
-                Node("h4001s", 1f, 1f),
-            ),
-            Node("j1001", 1f,1f) to listOf(
-                Node("j1002", 1f, 1f),
-            ),
-            Node("j1002", 1f,1f) to listOf(
-                Node("j1001", 1f, 1f),
-            ),
-        )
-
-        val rooms = mutableListOf<Room>(
-            Room(
-                "h3013",
-                "8305",
-                listOf(
-                    1f to 1f,
-                    1f to 1f,
-                    1f to 1f,
-                    1f to 1f
-                )
-            ),
-        )
-
-
-    }
-
-
+    
 }
 
-@Serializable
-data class Poi(
-    val name: String,
-    val label: String?,
-    val x: Float,
-    val y: Float
-)
-
-@Serializable
-data class User(
-    val id: Int,
-    val name: String,
-    val mail: String,
-    val login: String,
-    val password: String,
-    val role: String,
-    val active: Boolean,
-    val access: List<Char>
-)

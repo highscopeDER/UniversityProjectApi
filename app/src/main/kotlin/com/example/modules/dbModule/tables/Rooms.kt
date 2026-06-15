@@ -1,6 +1,6 @@
 package com.example.modules.dbModule.tables
 
-import org.jetbrains.exposed.sql.Table
+import org.jetbrains.exposed.v1.core.Table
 
 object Rooms : Table() {
 

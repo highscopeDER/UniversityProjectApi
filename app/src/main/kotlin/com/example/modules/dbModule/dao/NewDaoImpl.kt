@@ -7,10 +7,10 @@ import com.example.modules.dbModule.tables.Coord
 import com.example.modules.dbModule.tables.Neighbour
 import com.example.modules.dbModule.tables.Rooms
 import kotlinx.coroutines.Dispatchers
-import org.jetbrains.exposed.sql.SortOrder
-import org.jetbrains.exposed.sql.SqlExpressionBuilder.neq
-import org.jetbrains.exposed.sql.selectAll
-import org.jetbrains.exposed.sql.transactions.experimental.newSuspendedTransaction
+import org.jetbrains.exposed.v1.core.SortOrder
+import org.jetbrains.exposed.v1.core.neq
+import org.jetbrains.exposed.v1.jdbc.selectAll
+import org.jetbrains.exposed.v1.jdbc.transactions.experimental.newSuspendedTransaction
 
 class NewDaoImpl : NewDao {
 
