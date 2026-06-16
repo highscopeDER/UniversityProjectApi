@@ -1,18 +1,15 @@
 package com.example.plugins
 
-import com.example.modules.pathFindingModule.PathFindingRepositoryImpl
-import io.ktor.server.application.Application
-import io.ktor.server.application.call
+import com.example.modules.pathFindingModule.PathFindService
 import io.ktor.server.response.respond
 import io.ktor.server.routing.Route
 import io.ktor.server.routing.get
-import io.ktor.server.routing.routing
 import org.koin.ktor.ext.get
 import kotlin.text.isBlank
 
 fun Route.pathFindingRouting() {
 
-    val repository: PathFindingRepositoryImpl = get()
+    val repository: PathFindService = get()
 
     get("/searchPath/nodes") {
         call.respond(

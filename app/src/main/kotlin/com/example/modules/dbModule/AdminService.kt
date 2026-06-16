@@ -11,21 +11,13 @@ import com.example.modules.dbModule.models.requests.PointInsertRequest
 import com.example.modules.dbModule.models.requests.UserRequest
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.cancel
-import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.SharedFlow
-import kotlinx.coroutines.flow.collect
-import kotlinx.coroutines.flow.emptyFlow
-import kotlinx.coroutines.flow.flow
-import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import kotlinx.serialization.descriptors.buildSerialDescriptor
 import org.jetbrains.exposed.v1.core.statements.Statement
 
-class AdminRepositoryImpl(val adminDao: AdminDaoImpl) {
+class AdminService(val adminDao: AdminDaoImpl) {
 
     private val points: MutableStateFlow<List<Point>> = MutableStateFlow(emptyList())
     private val links: MutableStateFlow<List<PointLinks>> = MutableStateFlow(emptyList())

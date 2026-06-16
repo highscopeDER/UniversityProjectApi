@@ -1,6 +1,6 @@
 package com.example.modules.dbModule
 
-import com.example.modules.dbModule.dao.NewDao
+import com.example.modules.dbModule.dao.MobileDao
 import com.example.modules.dbModule.models.Floor
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -9,7 +9,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
-class DbRepositoryImpl(val dao: NewDao) {
+class MobileService(val dao: MobileDao) {
 
     private val _coordinates: MutableStateFlow<Map<String, Pair<Float, Float>>> = MutableStateFlow(emptyMap())
     private val _neighbours: MutableStateFlow<Map<String, List<String>>> = MutableStateFlow(emptyMap())

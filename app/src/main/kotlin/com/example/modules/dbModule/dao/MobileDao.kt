@@ -2,7 +2,7 @@ package com.example.modules.dbModule.dao
 
 import com.example.modules.dbModule.models.Floor
 
-interface NewDao {
+interface MobileDao {
 
     suspend fun coordinatesOfPoints(): Map<String, Pair<Float, Float>>
 

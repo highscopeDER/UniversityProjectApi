@@ -1,16 +1,15 @@
 package com.example
 
-import com.example.modules.dbModule.AdminRepositoryImpl
+import com.example.modules.dbModule.AdminService
 import com.example.modules.dbModule.User
 import com.example.modules.pathFindingModule.Node
 import org.junit.Test
 import kotlin.test.assertEquals
-import kotlin.test.assertTrue
 
 class Test {
 
 
-    val repo = AdminRepositoryImpl()
+    val repo = AdminService()
 
     @Test
     fun auth() {

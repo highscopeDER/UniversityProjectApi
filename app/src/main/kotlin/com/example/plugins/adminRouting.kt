@@ -1,7 +1,6 @@
 package com.example.plugins
 
-import com.example.modules.dbModule.AdminRepositoryImpl
-import com.example.modules.dbModule.models.User
+import com.example.modules.dbModule.AdminService
 import com.example.modules.dbModule.models.dto.Point
 import com.example.modules.dbModule.models.requests.LinkRequest
 import com.example.modules.dbModule.models.requests.PointInsertRequest
@@ -11,15 +10,13 @@ import io.ktor.server.request.receive
 import io.ktor.server.response.respond
 import io.ktor.server.routing.Route
 import io.ktor.server.routing.get
-import io.ktor.server.routing.param
 import io.ktor.server.routing.post
 import io.ktor.server.util.getOrFail
 import org.koin.ktor.ext.get
-import kotlin.collections.emptyList
 
 fun Route.adminRouting() {
 
-    val repository: AdminRepositoryImpl = get()
+    val repository: AdminService = get()
 
     val BASE = "/admin"
     val BASE_GET = "$BASE/get"

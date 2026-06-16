@@ -1,19 +1,19 @@
 package com.example.modules.dbModule
 
 import com.example.modules.dbModule.dao.AdminDaoImpl
-import com.example.modules.dbModule.dao.NewDao
-import com.example.modules.dbModule.dao.NewDaoImpl
+import com.example.modules.dbModule.dao.MobileDao
+import com.example.modules.dbModule.dao.MobileDaoImpl
 import org.koin.core.module.dsl.singleOf
 import org.koin.dsl.bind
 import org.koin.dsl.module
 
 val dbModule = module {
 
-    singleOf(::NewDaoImpl) bind NewDao::class
-    singleOf(::DbRepositoryImpl)
+    singleOf(::MobileDaoImpl) bind MobileDao::class
+    singleOf(::MobileService)
 
     singleOf(::AdminDaoImpl)
 
-    singleOf(::AdminRepositoryImpl)
+    singleOf(::AdminService)
 
 }

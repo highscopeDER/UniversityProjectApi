@@ -1,13 +1,13 @@
 package com.example.modules.pathFindingModule
 
-import com.example.modules.dbModule.DbRepositoryImpl
+import com.example.modules.dbModule.MobileService
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.stateIn
 
-class PathFindingRepositoryImpl(dbRepository: DbRepositoryImpl) {
+class PathFindService(dbRepository: MobileService) {
 
     private val graph = combine(dbRepository.coordinates, dbRepository.neighbours) { c, n ->
         Graph(c, n)
