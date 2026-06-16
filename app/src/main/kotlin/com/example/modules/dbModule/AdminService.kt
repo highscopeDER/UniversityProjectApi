@@ -208,7 +208,7 @@ class AdminService(val adminDao: AdminDaoImpl) {
                     list: List<Point>,
                 ): List<Point> {
                     return if(list.any { it.name == item.name })
-                        list.map { if(it.name == item.name) it else item }.toList()
+                        list.map { if(it.name == item.name) item else it }.toList()
                     else list.plus(item)
                 }
             }

@@ -93,6 +93,7 @@ fun Route.adminRouting() {
             }
             else -> call.respond(HttpStatusCode.BadRequest)
         }
+        call.respond(HttpStatusCode.OK)
     }
 
     get("$BASE_GET/links") {
@@ -115,6 +116,7 @@ fun Route.adminRouting() {
             }
             else -> call.respond(HttpStatusCode.BadRequest)
         }
+        call.respond(HttpStatusCode.OK)
     }
 
     get("$BASE_GET/ipoints") {
